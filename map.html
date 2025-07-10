@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Discover Community Gardens</title>
+
+    <!-- Simple responsive CSS via Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- GeoSearch CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
+
+    <style>
+      html, body { height: 100%; margin: 0; }
+      nav {
+        background: #28a745;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+      }
+      nav .nav-links a {
+        color: #fff;
+        margin-right: 1rem;
+        text-decoration: none;
+      }
+      nav .nav-links a:last-child { margin-right: 0; }
+      nav .nav-links a.active { font-weight: bold; text-decoration: underline; }
+      #filter-container { background: #f8f9fa; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem; }
+      #map { width: 100%; height: 65vh; }
+      #garden-list { height: 30vh; overflow-y: auto; background: #fff; padding: 0.5rem 1rem; }
+      #garden-list ul { list-style: none; padding: 0; margin: 0; }
+      #garden-list li { padding: 0.25rem 0; border-bottom: 1px solid #eee; cursor: pointer; }
+      /* Hide GeoSearch control in map corner */
+      .leaflet-top.leaflet-right .leaflet-control-geosearch,
+      .leaflet-top.leaflet-left .leaflet-control-geosearch {
+        display: none !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Top nav with embedded search -->
+  <nav>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="/about">About</a>
+    <a href="/resources">Resources</a>
+    <a href="map.html" class="active">Map</a>
+    <a href="/contact">Contact</a>
+  </div>      <!-- Search placed centrally in nav -->
+      <div id="search-container" style="flex: 1; max-width: 300px;"></div>
+    </nav>
+
+    <!-- Filter controls -->
+    <div id="filter-container">
+      <label for="garden-toggle" class="mb-0">Garden type:</label>
+      <select id="garden-toggle" class="form-select form-select-sm" style="width: auto;">
+        <option value="all">All</option>
+        <option value="community">Community</option>
+        <option value="tchc">TCHC</option>
+      </select>
+
+      <label for="view-toggle" class="mb-0">Boundaries:</label>
+      <select id="view-toggle" class="form-select form-select-sm" style="width: auto;">
+        <option value="none">None</option>
+        <option value="neighbourhoods">Neighbourhoods</option>
+        <option value="wards">Wards</option>
+      </select>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Gardens list -->
+    <div id="garden-list" class="px-3">
+      <h5>Gardens List</h5>
+      <ul id="list"></ul>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-geosearch/dist/bundle.min.js"></script>
+    <script>
+      // Initialize map
+      const map = L.map('map').setView([43.70, -79.42], 11);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{ attribution:'© OpenStreetMap & CartoDB', maxZoom:19 }).addTo(map);
+  
+      const gardenMarkers = {};
+
+      // Data arrays
+    const gardens = [
+      { name: "Alex Wilson Community Garden", address: "552 Richmond St W", lat: 43.64724805, lng: -79.40062398 },
+      { name: "Alexandra Park Diversity Garden", address: "275 Bathurst St", lat: 43.65066359, lng: -79.40356065 },
+      { name: "Ashbridges ECO Community Garden", address: "1956 Dundas St E", lat: 43.66914416, lng: -79.31647543 },
+      { name: "Beach Community Edible Garden", address: "1561 Lakeshore Blvd E", lat: 43.65870548, lng: -79.30895749 },
+      { name: "Bell Manor Park Community Garden", address: "1 Bayside Lane", lat: 43.63767935, lng: -79.49235395 },
+      { name: "Ben Nobleman Park Community Orchard", address: "1075 Eglinton Ave W", lat: 43.69866489, lng: -79.43556462 },
+      { name: "Cedarvale Park Community Garden", address: "443 Arlington Rd", lat: 43.69252178, lng: -79.43069819 },
+      { name: "Chester Le Olive Community Garden", address: "255 Chester Le Blvd", lat: 43.79977072, lng: -79.33226183 },
+      { name: "Christie Pits Community Garden", address: "750 Bloor St W", lat: 43.66475922, lng: -79.42070749 },
+      { name: "Dallington Pollinators Community Garden", address: "32 Glentworth Rd", lat: 43.77524559, lng: -79.35757177 },
+      { name: "Dovercourt Park Community Garden", address: "155 Bartlett Ave", lat: 43.66520734, lng: -79.43445546 },
+      { name: "Driftwood Parkette Community Garden", address: "359 Driftwood Ave", lat: 43.76879277, lng: -79.5137082 },
+      { name: "Dufferin Grove Community Garden", address: "875 Dufferin St", lat: 43.65805077, lng: -79.43293028 },
+      { name: "Earlscourt Park Community Garden", address: "1200 Lansdowne Ave", lat: 43.67414929, lng: -79.45143911 },
+      { name: "East York Community Centre Children’s Garden", address: "1081 1/2 Pape Ave", lat: 43.6918789, lng: -79.34925786 },
+      { name: "East York Community Garden", address: "9 Haldon Ave", lat: 43.69836556, lng: -79.31155453 },
+      { name: "Emmett Ave. Community Garden", address: "101 Emmett Ave", lat: 43.68617051, lng: -79.50581186 },
+      { name: "Flemingdon Park Community Garden", address: "150 Grenoble Dr", lat: 43.71356851, lng: -79.32643983 },
+      { name: "Frankel Lambert Park Community Garden", address: "340 Christie St", lat: 43.67277597, lng: -79.42225359 },
+      { name: "Fred’s Wildflower Garden", address: "155 Roxton Rd", lat: 43.65285125, lng: -79.42041423 },
+      { name: "Garrison Creek Community Garden", address: "1090 Shaw St", lat: 43.67163795, lng: -79.42827413 },
+      { name: "Gate House Transformational Healing Garden", address: "3145 Lake Shore Blvd W", lat: 43.59899388, lng: -79.51313805 },
+      { name: "Greenwood Park Community Garden", address: "150 Greenwood Ave", lat: 43.67012557, lng: -79.32906819 },
+      { name: "Hillcrest Park Community Garden", address: "950 Davenport Rd", lat: 43.67613702, lng: -79.42551933 },
+      { name: "HOPE Garden", address: "212 Cowan Ave", lat: 43.64037855, lng: -79.43311146 },
+      { name: "Hopewell Community Garden", address: "440 Hopewell Ave", lat: 43.69996112, lng: -79.44746509 },
+      { name: "Huron St. Garden", address: "180 Huron St", lat: 43.65781709, lng: -79.39827443 },
+      { name: "Jamestown Community Garden", address: "10 Rampart Rd", lat: 43.73496017, lng: -79.58874249 },
+      { name: "June Rowlands Children’s Garden", address: "220 Davisville Ave", lat: 43.70043455, lng: -79.38821897 },
+      { name: "Lawrence Heights Community Garden", address: "5 Replin Rd", lat: 43.7183766, lng: -79.44226258 },  
+ { name: "Leaside Park Community Garden", address: "5 Leaside Park Dr.", lat: 43.70228359, lng: -79.34944015 },
+  { name: "Littles Rd Park Community Garden", address: "30 Littles Rd", lat: 43.81602367, lng: -79.20421535 },
+  { name: "Maple Leaf Forever Park Community Garden", address: "62 Laing St", lat: 43.66299921, lng: -79.32782696 },
+  { name: "Matty Eckler Community Garden", address: "953 Gerrard St", lat: 43.66797025, lng: -79.33957425 },
+  { name: "Moss Park Community Kitchen Garden", address: "150 Sherbourne St", lat: 43.65561464, lng: -79.36998348 },
+  { name: "Neilson Park Community Garden", address: "1555 Neilson Rd", lat: 43.81257252, lng: -79.2251223 },
+  { name: "New Horizons Community Garden", address: "3216 Bloor St W", lat: 43.6475782, lng: -79.52032486 },
+  { name: "Oakdale Park Community Garden", address: "350 Grandravine Dr", lat: 43.74802938, lng: -79.51343343 },
+  { name: "Oriole Park Community Garden", address: "201 Oriole Pkwy", lat: 43.69750762, lng: -79.39973972 },
+  { name: "Panorama Park Community Garden", address: "31 Panorama Crt", lat: 43.7466781, lng: -79.57930433 },
+  { name: "Parkview Neighbourhood Garden", address: "293 Doris Ave", lat: 43.77220385, lng: -79.41157404 },
+  { name: "Perth Dupont Community Garden", address: "431 Perth Ave", lat: 43.66695508, lng: -79.45246683 },
+  { name: "Prairie Drive Park Community Garden", address: "70 Prairie Dr", lat: 43.69748514, lng: -79.28409746 },
+  { name: "Prospect St Community Garden", address: "560 C Parliament St", lat: 43.66709458, lng: -79.36957755 },
+  { name: "Ravina Community Garden", address: "280 Quebec Ave", lat: 43.66013776, lng: -79.47072478 },
+  { name: "Regent Park Community Garden", address: "620 Dundas St E", lat: 43.66104304, lng: -79.36303948 },
+  { name: "Rockcliffe Garden and Greenhouses", address: "301 Rockcliffe Blvd", lat: 43.67577062, lng: -79.48503931 },
+  { name: "Rockford Park Community Garden", address: "70 Rockford Rd", lat: 43.78660266, lng: -79.45382464 },
+  { name: "Roots of Scarborough East (ROSE) Community Garden", address: "4040 Lawrence Ave E", lat: 43.76615213, lng: -79.1989736 },
+  { name: "Scadding Court Urban Agriculture Program", address: "707 Dundas St W", lat: 43.65163032, lng: -79.40505209 },
+  { name: "Scarborough Village Community Garden", address: "3630 Kingston Rd", lat: 43.7420079, lng: -79.21483358 },
+  { name: "Shawnee Park Community Garden", address: "81 Shawnee Circle", lat: 43.79742972, lng: -79.33862447 },
+  { name: "The Beltline Karma Garden", address: "378 Mt Pleasant Rd", lat: 43.69777125, lng: -79.3867306 },
+  { name: "The Rail Garden", address: "450 Woodfield Rd", lat: 43.67610019, lng: -79.32602572 },
+  { name: "Thorncliffe Family Garden", address: "46 Thorncliffe Park Dr", lat: 43.70308089, lng: -79.34125918 },
+  { name: "Thorncliffe Park Garden Club Community Garden", address: "50 Beth Nelson Dr", lat: 43.71097646, lng: -79.34833436 },
+  { name: "Thorncliffe Park Garden Club Community Garden – West Side", address: "Opposite 50 Beth Nealson Dr.", lat: 43.71178221, lng: -79.34575991 },
+  { name: "Trinity Bellwoods Community Garden", address: "790 Queen St W, Toronto, ON M6J 2R5", lat: 43.64603095, lng: -79.41413549 },
+  { name: "West Lodge Park Community Garden", address: "165 Lansdowne Ave", lat: 43.64642904, lng: -79.43784093 },
+  { name: "Winchester Square Park Community Garden", address: "474 Ontario St", lat: 43.66424324, lng: -79.37086602 },
+  { name: "Adanac Apartments", address: "140 Adanac Dr, Scarborough, ON M1M 2H7", lat: 43.7406958, lng: -79.22684235 },
+  { name: "184 River St", address: "184 River St", lat: 43.66302028, lng: -79.35917565 },
+  { name: "259 Sumach Garden", address: "259 Sumach Street", lat: 43.66264248, lng: -79.36073572 },
+  { name: "40 Oaks Garden", address: "40 Oaks Garden", lat: 43.66109422, lng: -79.36613102 },
+  { name: "Community Connect Food Gardens", address: "627 Queen’s Quay West", lat: 43.63601739, lng: -79.3971098 },
+  { name: "Diane Frankling Community Garden", address: "85 Bleecker Street", lat: 43.66503342, lng: -79.37230049 },
+  { name: "Kimbourne Park United Church", address: "200 Wolverleigh Blvd", lat: 43.68571412, lng: -79.32251475 },
+  { name: "Garrison Flats Community Garden", address: "27-35 Wellington St E", lat: 43.6481259, lng: -79.37521886 },
+  { name: "Hurron-Sussex Community Garden (UofT)", address: "Toronto, ON M5S 0C2", lat: 43.66462734, lng: -79.40039896 },
+  { name: "Maloca Community Garden (YorkU)", address: "Toronto, ON M3N 2P3", lat: 43.76786288, lng: -79.50859283 },
+  { name: "Milky Way Garden", address: "87 Milky Way", lat: 43.64114749, lng: -79.43199927 },
+  { name: "Morningside-High Park Community Garden", address: "4 Morningside Avenue", lat: 43.64675362, lng: -79.47302622 },
+  { name: "Northview Garden", address: "540 Finch Ave W", lat: 43.77439306, lng: -79.44519429 },
+  { name: "Oakvale Greens", address: "77 Oakvale Ave", lat: 43.67940898, lng: -79.33413097 },
+  { name: "Oriole Community Garden", address: "2800 Don Mills Rd", lat: 43.7805885, lng: -79.34903405 },
+  { name: "The Garden Party", address: "1691 Bloor St W,", lat: 43.65508498, lng: -79.45738087 },
+  { name: "The Sky Garden (U of T)/Urban Agriculture Society", address: "35 St. George St.", lat: 43.66002201, lng: -79.39636656 },
+  { name: "The Stop's Green Barn", address: "601 Christie Street", lat: 43.68008065, lng: -79.42473546 },
+  { name: "Toronto Rehab's GROW: Garden Rehab. On Wheels.", address: "130 Dunn Ave", lat: 43.63495867, lng: -79.4327094 },
+  { name: "UrbanArts Community Art Garden", address: "5 Bartonville Ave. E.", lat: 43.68950631, lng: -79.49469733 },
+  { name: "Dovercourt Public School Garden", address: "228 Bartlett Ave, Toronto, ON M6H 3G4", lat: 43.66696954, lng: -79.4358895 },
+  { name: "Fort York", address: "250 Fort York Blvd", lat: 43.63746961, lng: -79.40657827 },
+  { name: "Martin Luther Evangelical Lutheran Church", address: "2379 Lake Shore Blvd W, Etobicoke, ON M8V 1C3", lat: 43.61554456, lng: -79.48822246 },
+  { name: "Downsview Park Community Garden", address: "160 Downsview Park Blvd, North York, ON M3K 0C8", lat: 43.73769156, lng: -79.47932147 },
+  { name: "Downsview Park Greenhouse", address: "160 Downsview Park Blvd, North York, ON M3K 0C8", lat: 43.73725027, lng: -79.48125294 },
+  { name: "George S Henry PS", address: "200 Graydon Hall Dr, North York, ON M3A 3A6", lat: 43.76398192, lng: -79.3400359 },
+  { name: "Scarborough Chinese Baptist Church (SCBC)", address: "3223 Kennedy Rd, Toronto, ON M1V 4Y1", lat: 43.81608767, lng: -79.3019425 },
+  { name: "Malvern Urban Farm", address: "2853 Morningside Ave", lat: 43.82586294, lng: -79.2313914 },
+  { name: "Windy Way Garden", address: "6 Glamorgan Ave", lat: 43.76968277, lng: -79.28493306 },
+  { name: "Scarborough Junction Farm", address: "3595 St Clair Ave East", lat: 43.71715425, lng: -79.25660595 },
+  { name: "Eglinton St. George's United Church (ESG)", address: "35 Lytton Blvd, Toronto, ON M4R 1L2", lat: 43.71578824, lng: -79.40288654 },
+  { name: "George Brown Community Garden", address: "500 Macpherson Ave,", lat: 43.6762719, lng: -79.41030725 },
+  { name: "Pelham Park-Carleton Village Community Garden", address: "115 Wiltshire Avenue", lat: 43.67113638, lng: -79.45222709 },
+  { name: "High Park Children’s Garden & Teaching Kitchen", address: "105 Colborne Lodge Dr", lat: 43.64195299, lng: -79.46188447 },
+  { name: "Roncesvalles Peace Garden", address: "2291 Dundas St W", lat: 43.65546284, lng: -79.4524429 },
+  { name: "Dufferin Grove Park Garden", address: "875 Dufferin St", lat: 43.65716796, lng: -79.43357309 },
+  { name: "Church of St. Stephen", address: "103 Bellevue Ave", lat: 43.65714992, lng: -79.40397163 },
+  { name: "South RIverdale Community Health Centre Rooftop Garden", address: "955 Queen St E", lat: 43.66130042, lng: -79.33913907 },
+  { name: "Harmony Garden Club", address: "2 Gower Street", lat: 43.70234731, lng: -79.29890517 },
+  { name: "Woburn Collegiate Institute", address: "2222 Ellesmere Rd", lat: 43.77832409, lng: -79.22796356 },
+  { name: "Woodbine Cares Community Food Garden", address: "555 rexdale boulevard", lat: 43.71554796, lng: -79.60380084 },
+  { name: "Black Creek Community Farm", address: "4929 Jane St. Toronto", lat: 43.77429406, lng: -79.52122835 },
+  { name: "LEGS Community Garden", address: "191 New Toronto St, Etobicoke, ON M8V 1H8", lat: 43.60699561, lng: -79.50416349 },
+  { name: "Kingsview Community Garden", address: "15 Kingsview Boulevard", lat: 43.69901585, lng: -79.54970461 },
+  { name: "Mama's Healing Garden", address: "2 Arcot Blvd", lat: 43.72776278, lng: -79.55156845 },
+  { name: "Thistletown CI", address: "20 Fordwich Crescent", lat: 43.72830437, lng: -79.56244166 },
+  { name: "John Polanyi CI ", address: "640 Lawrence Ave W", lat: 43.71788397, lng: -79.43996699 },
+  { name: "Toronto United Mennonite Church Community Garden", address: "1774 Queen Street East", lat: 43.6681703, lng: -79.31064332 }
+    ];
+    const tchGardens = [
+      { name: "Lerette Manor", address: "250 Twelfth St", lat: 43.60087007606924, lng: -79.51150224545724 },
+      { name: "Grigg's Manor", address: "100 Cavell Ave", lat: 43.6165900884736, lng: -79.49611403381131 },
+      { name: "Edwards Manor", address: "17 Bishop Tutu Blvd", lat: 43.63585159366306, lng: -79.39962241846841 },
+      { name: "Spencer Avenue", address: "91 Spencer Ave", lat: 43.637742370221865, lng: -79.4302027473038 },
+      { name: "Islington Manors", address: "41 Mabelle Ave", lat: 43.645035836536664, lng: -79.52761177429048 },
+      { name: "Dundas Mabelle", address: "5005 Dundas St W", lat: 43.646537932071574, lng: -79.53050951846781 },
+      { name: "May Robinson Apartments", address: "588 Queen St W", lat: 43.64758482895936, lng: -79.40424094545487 },
+      { name: "The Esplanade", address: "25 Henry Lane Terrace", lat: 43.647809318399396, lng: -79.37025213196137 },
+      { name: "Scadding Avenue", address: "15 Scadding Avenue", lat: 43.64860400553703, lng: -79.36675031846778 },
+      { name: "140 The Esplanade", address: "140 The Esplanade", lat: 43.648607638895726, lng: -79.3702359039622 },
+      { name: "Wales Casimir", address: "75 Wales Ave", lat: 43.65289810129786, lng: -79.40430138963211 },
+      { name: "25 Mutual Street", address: "25 Mutual Street", lat: 43.654542320788025, lng: -79.37440241846747 },
+      { name: "Sherbourne Shuter", address: "155 Sherbourne St", lat: 43.655927804156235, lng: -79.36950318963194 },
+      { name: "Riverdale Acres", address: "237 Sherbourne St", lat: 43.65891060949417, lng: -79.37081290127692 },
+      { name: "145 Mutual Street", address: "145 Mutual Street", lat: 43.65920582306098, lng: -79.37641403196078 },
+      { name: "Dan Harrison Complex", address: "251 Sherbourne St", lat: 43.65948690800415, lng: -79.37106226079628 },
+      { name: "220 Oak Street Community Garden/Gerrard River", address: "220 Oak Street", lat: 43.66156214899385, lng: -79.36532598963167 },
+      { name: "May Birchard Apartments", address: "859 Dundas Street E", lat: 43.66232103112203, lng: -79.35162835894766 },
+      { name: "Donvale Manor", address: "330 Gerrard St E", lat: 43.66266183835075, lng: -79.3654139626445 },
+      { name: "Jarvis Carlton Apartments", address: "330 Jarvis Street", lat: 43.662799206586975, lng: -79.37706343196065 },
+      { name: "Carling Irene", address: "5 Carling Ave", lat: 43.66283886075963, lng: -79.42466070312511 },
+      { name: "Winchester Square", address: "55 Bleecker Street", lat: 43.66457779484083, lng: -79.3722741896315 },
+      { name: "Pendrith Park", address: "177 Pendrith St", lat: 43.66525178200902, lng: -79.425292360796 },
+      { name: "Dundas Gooch", address: "3725 Dundas St W", lat: 43.665536236662795, lng: -79.49884437613797 },
+      { name: "Wellesley Jarvis Place", address: "460 Jarvis St", lat: 43.66612505683967, lng: -79.37845080127653 },
+      { name: "Senator D. Croll Apartments", address: "351 Bloor St W", lat: 43.667211231465274, lng: -79.40136476079587 },
+      { name: "Huron Madison", address: "13 Madison Ave", lat: 43.66811995013344, lng: -79.40292346079583 },
+      { name: "Pelham Park Gardens", address: "61 Pelham Park Gardens", lat: 43.66954618758942, lng: -79.45785967428932 },
+      { name: "Frances Beavis Manor", address: "369 Pape Avenue", lat: 43.670087841077375, lng: -79.34087400312474 },
+      { name: "Symington Place", address: "1884 Davenport Rd", lat: 43.67101555929161, lng: -79.45371620127634 },
+      { name: "Bartlett Avenue", address: "331 Bartlett Ave N", lat: 43.67124741725944, lng: -79.4369747184666 },
+      { name: "Edgewood Apartments", address: "59 Edgewood Ave", lat: 43.67200054208975, lng: -79.31383360698801 },
+      { name: "Elmer Avenue", address: "98 Elmer Ave", lat: 43.67255763521483, lng: -79.3051797338085 },
+      { name: "Blake Boultbee", address: "80 Blake Boultbee", lat: 43.673235513191045, lng: -79.33818428778265 },
+      { name: "Lambert Court", address: "10 Lambertlodge Ave", lat: 43.67367237144029, lng: -79.42424675894713 },
+      { name: "Beaches Lions Centennial", address: "50 Norway Ave", lat: 43.67426959622525, lng: -79.30475926533376 },
+      { name: "Newbold Avenue", address: "11 Newbold Ave", lat: 43.6749110892636, lng: -79.31773904730191 },
+      { name: "250 Davenport Road", address: "250 Davenport Rd", lat: 43.67499316866752, lng: -79.39836628963099 },
+      { name: "Coatsworth Crescent", address: "33 Coatsworth Cres", lat: 43.67954506319649, lng: -79.32016676079526 },
+      { name: "Hanson House", address: "7 Coatsworth Cres", lat: 43.679747337141414, lng: -79.32175196079525 },
+      { name: "Mount Dennis Apartments", address: "101 Humber Blvd S, Unit 302", lat: 43.67988728824567, lng: -79.48196084730169 },
+      { name: "Glen Steward Acres", address: "828 Kingston Rd", lat: 43.68045247635789, lng: -79.29228780312432 },
+      { name: "Greenwood Towers", address: "145 Strathmore Blvd", lat: 43.68187495010721, lng: -79.33405888963063 },
+      { name: "Silverthorn Place", address: "600 Rogers Rd", lat: 43.682095719190634, lng: -79.4718954607951 },
+      { name: "Woodbine Acres", address: "133 Merrill Ave", lat: 43.6831668176668, lng: -79.3120658473015 },
+      { name: "Trimbee Court", address: "30 Denarda St", lat: 43.68946327683675, lng: -79.49224078778187 },
+      { name: "Blair Court", address: "266 Donlands Ave", lat: 43.6898140978443, lng: -79.34181464545279 },
+      { name: "Humber Acres", address: "599 Scarlett Rd", lat: 43.69295523259975, lng: -79.51692986079458 },
+      { name: "Byng Towers", address: "3330 Danforth Ave", lat: 43.69396437803895, lng: -79.27851811661711 },
+      { name: "Doug Saunders Apartments", address: "1775 Eglinton Ave W", lat: 43.6960079992202, lng: -79.44877754730093 },
+      { name: "East York Community Garden/East York Acres", address: "9 Haldon Ave", lat: 43.69850089115789, lng: -79.31157118962979 },
+      { name: "Jane John Best", address: "1570 Jane St", lat: 43.69933599885897, lng: -79.5034597742878 },
+      { name: "McClain Park Apartments", address: "10 Glen Everest Rd", lat: 43.69947526449039, lng: -79.25481544730074 },
+      { name: "Woodland Acres South", address: "40 Firvalley Ct", lat: 43.70379214953097, lng: -79.27944007428755 },
+      { name: "Woodland Acres North", address: "682 Warden Ave", lat: 43.70615894310014, lng: -79.27905606079392 },
+      { name: "2401 Yonge Street", address: "2401 Yonge Street", lat: 43.710323176504, lng: -79.39882697428726 },
+      { name: "Centennial Apartments", address: "11 Wakunda Place", lat: 43.7160697525653, lng: -79.30424190681929 },
+      { name: "Downsview Acres", address: "2195 Jane St", lat: 43.72242661376016, lng: -79.50844063380606 },
+      { name: "Tanridge Crescent", address: "75 Tandridge Cres", lat: 43.72915579198567, lng: -79.5460087319573 },
+      { name: "Thistletown", address: "15-268 Jamestown Cres", lat: 43.73300767482372, lng: -79.58654841846354 },
+      { name: "Weston Towers", address: "3101 Weston Rd", lat: 43.733583868564494, lng: -79.53716524545058 },
+      { name: "Robert J. Smith Apartments", address: "101 Kendleton Dr", lat: 43.73864301939437, lng: -79.58088277613425 },
+      { name: "Adanac Apartments", address: "140 Adanac Dr", lat: 43.74069579787998, lng: -79.22692817613411 },
+      { name: "Rowntree Manor", address: "2765 Islington Avenue", lat: 43.744173520016076, lng: -79.56725476079203 },
+      { name: "Sentinel Road", address: "182 Sentinel Rd", lat: 43.75221496694259, lng: -79.49819410312067 },
+      { name: "Northwood Apartments", address: "3680 Keele Street", lat: 43.75415851262221, lng: -79.48961376079149 },
+      { name: "Brimley Acres", address: "2950 Lawrence Avenue E", lat: 43.755432810274804, lng: -79.25060636079142 },
+      { name: "Lawrence Susan", address: "3847 Lawrence Ave E", lat: 43.76300238856922, lng: -79.20963174544917 },
+      { name: "Kingston Galloway", address: "4301 Kingston Road", lat: 43.763318345618956, lng: -79.19340383010727 },
+      { name: "West Hill Apartments", address: "4175 Lawrence Ave", lat: 43.7673996202892, lng: -79.18885714729736 },
+      { name: "Morningside Apartments", address: "4205 Lawrence Ave E", lat: 43.76817677007947, lng: -79.1852446877779 },
+      { name: "Edgely Apartments", address: "35 Shoreham Dr", lat: 43.76898671073628, lng: -79.5183724338037 },
+      { name: "Tam O'Shanter Towers", address: "3825 Sheppard Ave E", lat: 43.782355281876434, lng: -79.29161985894176 },
+      { name: "Courtland Mews Community Garden", address: "229 Meadowvale Rd", lat: 43.78671668789, lng: -79.160772430106 },
+      { name: "Cliffwood Manor", address: "4000 Don Mills Rd", lat: 43.78715886818335, lng: -79.35298707428339 },
+      { name: "Mornelle Morningside", address: "70 Mornelle Ct", lat: 43.787202568058795, lng: -79.19801973380278 },
+      { name: "Willowdale Manor", address: "175 Cummer Ave", lat: 43.788056729977775, lng: -79.40863327428337 },
+      { name: "St. George Manor + Greenhouse", address: "17 Brimley Rd", lat: 43.788056729977775, lng: -79.40863327428337 }
+    ];
+// create two empty layer‐groups to hold our markers
+const communityLayer = L.layerGroup().addTo(map);
+const tchLayer       = L.layerGroup().addTo(map);
+
+      // Layers & markers
+ // Community gardens
+      gardens.forEach(g => {
+  const m = L.marker([g.lat, g.lng])
+    .bindPopup(`<strong>${g.name}</strong><br>${g.address}`)
+    .addTo(communityLayer);
+  gardenMarkers[g.name] = m;    // ← save it for later
+});
+
+// TCHC gardens
+tchGardens.forEach(g => {
+  const m = L.marker([g.lat, g.lng])
+    .bindPopup(`<strong>${g.name}</strong><br>${g.address}`)
+    .addTo(tchLayer);
+  gardenMarkers[g.name] = m;    // ← save it for later
+});
+      // Render list
+      function renderList(list) {
+        const ul = document.getElementById('list'); ul.innerHTML='';
+        list.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = item.dist != null
+            ? `${item.name} — ${(item.dist/1000).toFixed(2)} km`
+            : item.name;
+          ul.appendChild(li);
+        });
+      }
+      
+document.getElementById('list').addEventListener('click', e => {
+  // only act when an <li> is clicked
+  if (e.target.tagName === 'LI') {
+    // extract the garden name (before any “ — X km” text)
+    const name = e.target.textContent.split(' — ')[0];
+    const m    = gardenMarkers[name];
+    if (!m) return;               // safety check
+    map.setView(m.getLatLng(), 17);
+    m.openPopup();
+  }
+});
+
+      // Initial list & view toggle
+      function updateGardenView() {
+        const v = document.getElementById('garden-toggle').value;
+        map.removeLayer(communityLayer); map.removeLayer(tchLayer);
+        let list;
+        if (v==='all')      { communityLayer.addTo(map); tchLayer.addTo(map); list = gardens.concat(tchGardens); }
+        else if (v==='community') { communityLayer.addTo(map); list = gardens; }
+        else                   { tchLayer.addTo(map); list = tchGardens; }
+        renderList(list);
+      }
+      document.getElementById('garden-toggle').addEventListener('change', updateGardenView);
+      updateGardenView();
+
+      // GeoSearch setup
+      const provider = new GeoSearch.OpenStreetMapProvider();
+      const searchControl = new GeoSearch.GeoSearchControl({
+        provider,
+        style: 'bar',
+        showMarker: true,
+        showPopup: false,
+        searchLabel: 'Enter your address…',
+        marker: { icon: new L.Icon({
+          iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+          iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        }) }
+      });
+      // Insert into nav
+      const searchEl = searchControl.onAdd(map);
+      document.getElementById('search-container').appendChild(searchEl);
+
+      // Search event: update top-3
+      map.on('geosearch/showlocation', e => {
+        const loc = L.latLng(e.location.y, e.location.x);
+        map.setView(loc, 14);
+        const arr = gardens.concat(tchGardens);
+        const distList = arr.map(g => ({ name: g.name, dist: map.distance(loc, L.latLng(g.lat, g.lng)) }));
+        distList.sort((a, b) => a.dist - b.dist);
+        renderList(distList.slice(0, 3));
+      });
+
+      // Boundary toggles
+      const neighbourhoodLayer = L.geoJSON(null, {
+        style: { color: '#3388ff', weight: 2, fillOpacity: 0 },
+        onEachFeature: (f, l) => { l.bindTooltip(f.properties.AREA_NAME,{ sticky:true })
+          .on('mouseover',() => l.setStyle({ fillOpacity:0.2 }))
+          .on('mouseout',() => l.setStyle({ fillOpacity:0 })); }
+      });
+      fetch('https://gis.toronto.ca/arcgis/rest/services/cot_geospatial26/FeatureServer/9/query?where=1=1&outFields=AREA_NAME&f=geojson')
+        .then(r => r.json()).then(d => neighbourhoodLayer.addData(d));
+      const wardLayer = L.geoJSON(null, {
+        style: { color: '#ff7800', weight: 2, fillOpacity: 0 },
+        onEachFeature: (f, l) => { l.bindTooltip(f.properties.AREA_NAME.replace(/^Ward\\s*/i,''),{ sticky:true })
+          .on('mouseover',() => l.setStyle({ fillOpacity:0.2 }))
+          .on('mouseout',() => l.setStyle({ fillOpacity:0 })); }
+      });
+      fetch('https://gis.toronto.ca/arcgis/rest/services/cot_geospatial22/FeatureServer/0/query?where=1=1&outFields=AREA_NAME&f=geojson')
+        .then(r => r.json()).then(d => wardLayer.addData(d));
+      document.getElementById('view-toggle').addEventListener('change', function() {
+        const v = this.value;
+        if (v==='neighbourhoods') { map.addLayer(neighbourhoodLayer); map.removeLayer(wardLayer); }
+        else if (v==='wards')       { map.addLayer(wardLayer); map.removeLayer(neighbourhoodLayer); }
+        else                        { map.removeLayer(neighbourhoodLayer); map.removeLayer(wardLayer); }
+      });
+    </script>
+  </body>
+</html>
