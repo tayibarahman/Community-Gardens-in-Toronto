@@ -1,36 +1,110 @@
-<!DOCTYPE html><!-- This site was created in Webflow. https://webflow.com --><!-- Last Published: Thu Jul 10 2025 20:33:09 GMT+0000 (Coordinated Universal Time) -->
-<html data-wf-domain="community-gardens-in-toronto.webflow.io" data-wf-page="685b1a25837cd775b2db9877" data-wf-site="685b1a25837cd775b2db9857" data-wf-status="1">
-  <head>
-    <meta charset="utf-8"/>
-    <title>Community Gardens in Toronto</title>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
-    <meta content="Webflow" name="generator"/>
-    <link href="https://cdn.prod.website-files.com/685b1a25837cd775b2db9857/css/community-gardens-in-toronto.webflow.shared.54a86dbe1.css" rel="stylesheet" type="text/css"/>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js" type="text/javascript"></script>
-    <script type="text/javascript">
-      WebFont.load({  
-        google: { families: ["Nunito Sans:regular","Arima:regular"] }
-      });
-    </script>
-    <script type="text/javascript">
-      !function(o,c){
-        var n=c.documentElement,t=" w-mod-";
-        n.className+=t+"js",
-        ("ontouchstart"in o||o.DocumentTouch&&c instanceof DocumentTouch)&&(n.className+=t+"touch")
-      }(window,document);
-    </script>
-    <link href="https://cdn.prod.website-files.com/img/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
-    <link href="https://cdn.prod.website-files.com/img/webclip.png" rel="apple-touch-icon"/>
-  </head>
-  <body>
-    <script src="https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=685b1a25837cd775b2db9857"
-            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-            crossorigin="anonymous">
-    </script>
-    <script src="https://cdn.prod.website-files.com/685b1a25837cd775b2db9857/js/webflow.schunk.36b8fb49256177c8.js"></script>
-    <script src="https://cdn.prod.website-files.com/685b1a25837cd775b2db9857/js/webflow.schunk.3b1938cfc3ed88ce.js"></script>
-    <script src="https://cdn.prod.website-files.com/685b1a25837cd775b2db9857/js/webflow.1860eed5.05130e77a45aa86e.js"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restoring Roots - Community Gardens in Toronto</title>
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito Sans', sans-serif; line-height: 1.6; color: #333; }
+    a { text-decoration: none; color: inherit; }
+
+    /* Header */
+    header { background: #2c7a7b; color: #fff; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1rem; }
+    .logo { font-size: 1.5rem; font-weight: bold; }
+    .nav-links { list-style: none; display: flex; gap: 1.5rem; }
+    .nav-links li:hover a { opacity: 0.8; }
+    .nav-toggle { display: none; cursor: pointer; font-size: 1.5rem; }
+
+    /* Hero */
+    .hero { display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; height: 80vh;
+            background: url('https://source.unsplash.com/1600x900/?community-garden,toronto') center/cover no-repeat;
+            color: #fff; padding: 0 1rem; }
+    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
+    .hero p { font-size: 1.2rem; margin-bottom: 2rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
+    .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #ed8936; color: #fff; border-radius: 4px; transition: background 0.3s; }
+    .btn:hover { background: #dd6b20; }
+
+    /* Features */
+    section.features { max-width: 1200px; margin: 4rem auto; display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 2rem; padding: 0 1rem; }
+    .feature-card { padding: 2rem; border: 1px solid #e2e8f0; border-radius: 8px;
+                    text-align: center; transition: transform 0.3s, box-shadow 0.3s; }
+    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .feature-card h3 { margin-bottom: 1rem; color: #2c7a7b; }
+
+    /* Footer */
+    footer { background: #1a202c; color: #a0aec0; padding: 2rem 1rem; }
+    footer .container { max-width: 1200px; margin: 0 auto; text-align: center; }
+    .social-links { list-style: none; display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+    footer p { margin-top: 1rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; flex-direction: column; background: #2c7a7b; width: 100%; text-align: center; }
+      .nav-toggle { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Restoring Roots</div>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Map</a></li>
+          <li><a href="#">Programs</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </nav>
+      <div class="nav-toggle">☰</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Discover & Grow Community Gardens in Toronto</h1>
+      <p>Explore, join, and nurture green spaces across the city.</p>
+      <a href="#" class="btn">Explore the Map</a>
+    </section>
+
+    <section class="features">
+      <div class="feature-card">
+        <h3>Find Gardens</h3>
+        <p>Browse community garden locations and amenities across all neighborhoods.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Programs & Workshops</h3>
+        <p>Attend events and learn new skills from our gardening workshops.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Connect & Volunteer</h3>
+        <p>Join local initiatives and support community-led green projects.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <ul class="social-links">
+        <li><a href="mailto:info@restoringroots.org">Email Us</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <p>All rights reserved © 2025 Restoring Roots</p>
+    </div>
+  </footer>
+
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const links = document.querySelector('.nav-links');
+    toggle.addEventListener('click', () => {
+      links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+    });
+  </script>
+</body>
 </html>
