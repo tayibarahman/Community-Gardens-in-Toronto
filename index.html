@@ -36,6 +36,7 @@
                     text-align: center; transition: transform 0.3s, box-shadow 0.3s; }
     .feature-card:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     .feature-card h3 { margin-bottom: 1rem; color: #2c7a7b; }
+    .feature-card a { color: inherit; }
 
     /* Footer */
     footer { background: #1a202c; color: #a0aec0; padding: 2rem 1rem; }
@@ -54,15 +55,15 @@
   <header>
     <div class="navbar">
       <div class="logo">Restoring Roots</div>
-        <nav>
-      <div class="nav-links">
-        <a href="/">Home</a> class="active"
-        <a href="/about.html">About</a>
-        <a href="/resources.html">Resources</a>
-        <a href="/map.html">Map</a>
-        <a href="/contact.html">Contact</a>
-      </div>
-    </nav>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="map.html">Map</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
       <div class="nav-toggle">☰</div>
     </div>
   </header>
@@ -71,22 +72,22 @@
     <section class="hero">
       <h1>Discover & Grow Community Gardens in Toronto</h1>
       <p>Explore, join, and nurture green spaces across the city.</p>
-      <a href="#" class="btn">Explore the Map</a>
+      <a href="map.html" class="btn">Explore the Map</a>
     </section>
 
     <section class="features">
-      <div class="feature-card">
+      <a href="map.html" class="feature-card">
         <h3>Find Gardens</h3>
         <p>Browse community garden locations and amenities across all neighborhoods.</p>
-      </div>
-      <div class="feature-card">
+      </a>
+      <a href="resources.html" class="feature-card">
         <h3>Programs & Workshops</h3>
         <p>Attend events and learn new skills from our gardening workshops.</p>
-      </div>
-      <div class="feature-card">
+      </a>
+      <a href="contact.html" class="feature-card">
         <h3>Connect & Volunteer</h3>
         <p>Join local initiatives and support community-led green projects.</p>
-      </div>
+      </a>
     </section>
   </main>
 
@@ -94,7 +95,7 @@
     <div class="container">
       <ul class="social-links">
         <li><a href="mailto:info@restoringroots.org">Email Us</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="contact.html">Contact</a></li>
       </ul>
       <p>All rights reserved © 2025 Restoring Roots</p>
     </div>
