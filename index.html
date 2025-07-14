@@ -13,30 +13,71 @@
 
     /* Header */
     header { background: #28a745; color: #fff; }
-    .navbar { position: relative; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 1rem; }
-    .logo { font-size: 1.5rem; font-weight: bold; position: absolute; left: 50%; transform: translateX(-50%); }
-    .nav-links { list-style: none; display: flex; gap: 1.5rem; }
+    .navbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .logo { font-size: 1.75rem; font-weight: bold; }
+    .nav-toggle {
+      position: absolute;
+      right: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+    }
+    nav.nav-container {
+      background: #28a745;
+      text-align: center;
+    }
+    .nav-links {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 0.5rem 0;
+    }
     .nav-links li:hover a { opacity: 0.8; }
-    .nav-toggle { display: none; cursor: pointer; font-size: 1.5rem; }
 
     /* Hero */
-    .hero { display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; height: 80vh;
-            background: url('https://source.unsplash.com/1600x900/?community-garden,toronto') center/cover no-repeat;
-            color: #fff; padding: 0 1rem; }
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 80vh;
+      background: url('images/garden.jpg') center/cover no-repeat;
+      color: #fff;
+      padding: 0 1rem;
+    }
     .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
     .hero p { font-size: 1.2rem; margin-bottom: 2rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
     .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #ed8936; color: #fff; border-radius: 4px; transition: background 0.3s; }
     .btn:hover { background: #dd6b20; }
 
     /* Features */
-    section.features { max-width: 1200px; margin: 4rem auto; display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 2rem; padding: 0 1rem; }
-    .feature-card { padding: 2rem; border: 1px solid #e2e8f0; border-radius: 8px;
-                    text-align: center; transition: transform 0.3s, box-shadow 0.3s; }
+    section.features {
+      max-width: 1200px;
+      margin: 4rem auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+      gap: 2rem;
+      padding: 0 1rem;
+    }
+    .feature-card {
+      padding: 2rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
     .feature-card:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     .feature-card h3 { margin-bottom: 1rem; color: #2c7a7b; }
-    .feature-card a { color: inherit; }
 
     /* Footer */
     footer { background: #1a202c; color: #a0aec0; padding: 2rem 1rem; }
@@ -46,7 +87,7 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-      .nav-links { display: none; flex-direction: column; background: #28a745; width: 100%; text-align: center; }
+      .nav-links { display: none; flex-direction: column; }
       .nav-toggle { display: block; }
     }
   </style>
@@ -55,17 +96,17 @@
   <header>
     <div class="navbar">
       <div class="logo">Community Gardens in Toronto</div>
-      <nav>
-        <ul class="nav-links">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About</a></li>
-          <li><a href="resources.html">Resources</a></li>
-          <li><a href="map.html">Map</a></li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-      </nav>
       <div class="nav-toggle">☰</div>
     </div>
+    <nav class="nav-container">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="map.html">Map</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
   </header>
 
   <main>
