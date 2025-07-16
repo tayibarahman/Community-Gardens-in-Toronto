@@ -1,100 +1,64 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Community Gardens in Toronto</title>
-  <style>
-    /* Reset */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Nunito Sans', sans-serif; line-height: 1.6; color: #333; }
-    a { text-decoration: none; color: inherit; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Discover Community Gardens</title>
 
-    /* Header */
-    header { background: #28a745; color: #fff; }
-    .navbar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
-    }
-    .logo { font-size: 1.75rem; font-weight: bold; }
-    .nav-toggle {
-      position: absolute;
-      right: 1rem;
-      font-size: 1.5rem;
-      cursor: pointer;
-      display: none;
-    }
-    nav.nav-container {
-      background: #28a745;
-      text-align: center;
-    }
-    .nav-links {
-      list-style: none;
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      padding: 0.5rem 0;
-    }
-    .nav-links li:hover a { opacity: 0.8; }
+    <!-- Simple responsive CSS via Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
-    /* Hero */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      height: 80vh;
-      /* Pastel marble green background */
-      background: #d8f3dc;
-      color: #333;
-      padding: 0 1rem;
-    }
-    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; color: #2c7a7b; }
-    .hero p { font-size: 1.2rem; margin-bottom: 2rem; color: #4a5568; }
-    .btn { display: inline-block; padding: 0.75rem 1.5rem; background: #ed8936; color: #fff; border-radius: 4px; transition: background 0.3s; }
-    .btn:hover { background: #dd6b20; }
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- GeoSearch CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
 
-    /* Features */
-    section.features {
-      max-width: 1200px;
-      margin: 4rem auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
-      gap: 2rem;
-      padding: 0 1rem;
-    }
-    .feature-card {
-      padding: 2rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      background: #fff;
-      text-align: center;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .feature-card:hover { transform: translateY(-5px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    .feature-card h3 { margin-bottom: 1rem; color: #2c7a7b; }
+    <style>
+      html, body { height: 100%; margin: 0; }
+      nav {
+        background: #28a745;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+      }
+      nav .nav-links a {
+        color: #fff;
+        margin-right: 1rem;
+        text-decoration: none;
+      }
+      nav .nav-links a:last-child { margin-right: 0; }
+      nav .nav-links a.active { font-weight: bold; text-decoration: underline; }
+      #filter-container { background: #f8f9fa; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem; }
+      #map { width: 100%; height: 65vh; }
+      #garden-list { height: 30vh; overflow-y: auto; background: #fff; padding: 0.5rem 1rem; }
+      #garden-list ul { list-style: none; padding: 0; margin: 0; }
+      #garden-list li { padding: 0.25rem 0; border-bottom: 1px solid #eee; cursor: pointer; }
+      /* Hide GeoSearch control in map corner */
+      .leaflet-top.leaflet-right .leaflet-control-geosearch,
+      .leaflet-top.leaflet-left .leaflet-control-geosearch {
+        display: none !important;
+      }
+    </style>
+  </head>
 
-    /* Footer */
-    footer { background: #1a202c; color: #a0aec0; padding: 2rem 1rem; }
-    footer .container { max-width: 1200px; margin: 0 auto; text-align: center; }
-    .social-links { list-style: none; display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
-    footer p { margin-top: 1rem; }
+  <body>
+    <!-- Top nav with embedded search -->
+  <nav>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="/about">About</a>
+    <a href="/resources">Resources</a>
+    <a href="map.html" class="active">Map</a>
+    <a href="/contact">Contact</a>
+  </div>      <!-- Search placed centrally in nav -->
+      <div id="search-container" style="flex: 1; max-width: 300px;"></div>
+    </nav>
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .nav-links { display: none; flex-direction: column; }
-      .nav-toggle { display: block; }
-    }
-  </style>
-</head>
   <body>
     <!-- Top nav with embedded search -->
   <nav>
