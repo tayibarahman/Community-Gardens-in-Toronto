@@ -1,64 +1,44 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Discover Community Gardens</title>
-
-    <!-- Simple responsive CSS via Bootstrap -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- GeoSearch CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
-
-    <style>
-      html, body { height: 100%; margin: 0; }
-      nav {
-        background: #28a745;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.5rem 1rem;
-      }
-      nav .nav-links a {
-        color: #fff;
-        margin-right: 1rem;
-        text-decoration: none;
-      }
-      nav .nav-links a:last-child { margin-right: 0; }
-      nav .nav-links a.active { font-weight: bold; text-decoration: underline; }
-      #filter-container { background: #f8f9fa; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 1rem; }
-      #map { width: 100%; height: 65vh; }
-      #garden-list { height: 30vh; overflow-y: auto; background: #fff; padding: 0.5rem 1rem; }
-      #garden-list ul { list-style: none; padding: 0; margin: 0; }
-      #garden-list li { padding: 0.25rem 0; border-bottom: 1px solid #eee; cursor: pointer; }
-      /* Hide GeoSearch control in map corner */
-      .leaflet-top.leaflet-right .leaflet-control-geosearch,
-      .leaflet-top.leaflet-left .leaflet-control-geosearch {
-        display: none !important;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- Top nav with embedded search -->
-  <nav>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="/about">About</a>
-    <a href="/resources">Resources</a>
-    <a href="map.html" class="active">Map</a>
-    <a href="/contact">Contact</a>
-  </div>      <!-- Search placed centrally in nav -->
-      <div id="search-container" style="flex: 1; max-width: 300px;"></div>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Gardens Map | Toronto</title>
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito Sans', sans-serif; color: #333; line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
+    header { background: #28a745; color: #fff; }
+    .navbar { display: flex; justify-content: center; align-items: center; position: relative; max-width: 1200px; margin: 0 auto; padding: 1rem; }
+    .logo { font-size: 1.75rem; font-weight: bold; }
+    .nav-toggle { display: none; position: absolute; right: 1rem; font-size: 1.5rem; cursor: pointer; }
+    nav.nav-container { background: #28a745; text-align: center; }
+    .nav-links { list-style: none; display: flex; justify-content: center; gap: 1.5rem; padding: 0.5rem 0; }
+    .nav-links li:hover a { opacity: 0.8; }
+    @media (max-width: 768px) { .nav-toggle { display: block; } .nav-links { display: none; flex-direction: column; } }
+    /* Map container */
+    #map { width: 100%; height: 90vh; }
+  </style>
+  <!-- Include Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Community Gardens in Toronto</div>
+      <div class="nav-toggle">☰</div>
+    </div>
+    <nav class="nav-container">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#map-section">Map</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
     </nav>
-
+  </header>
+  
     <!-- Filter controls -->
     <div id="filter-container">
       <label for="garden-toggle" class="mb-0">Garden type:</label>
