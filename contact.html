@@ -1,57 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>About – Discover Community Gardens</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact | Community Gardens in Toronto</title>
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito Sans', sans-serif; color: #333; line-height: 1.6; }
+    a { text-decoration: none; color: inherit; }
 
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    /* Header (shared) */
+    header { background: #28a745; color: #fff; }
+    .navbar { display: flex; justify-content: center; align-items: center; position: relative; max-width: 1200px; margin: 0 auto; padding: 1rem; }
+    .logo { font-size: 1.75rem; font-weight: bold; }
+    .nav-toggle { display: none; position: absolute; right: 1rem; font-size: 1.5rem; cursor: pointer; }
+    nav.nav-container { background: #28a745; text-align: center; }
+    .nav-links { list-style: none; display: flex; justify-content: center; gap: 1.5rem; padding: 0.5rem 0; }
+    .nav-links li:hover a { opacity: 0.8; }
 
-    <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-      }
-      nav {
-        background: #28a745;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.5rem 1rem;
-      }
-      nav .nav-links a {
-        color: #fff;
-        margin-right: 1rem;
-        text-decoration: none;
-      }
-      nav .nav-links a.active {
-        font-weight: bold;
-        text-decoration: underline;
-      }
-    </style>
-  </head>
+    /* Main */
+    main { max-width: 800px; margin: 3rem auto; padding: 0 1rem; }
+    h1 { text-align: center; margin-bottom: 1rem; color: #2c7a7b; }
+    p { text-align: center; margin-bottom: 2rem; color: #4a5568; }
 
-  <body>
-    <!-- Top nav -->
-<nav>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="resources.html">Resources</a>
-    <a href="map.html">Map</a>
-    <a href="contact.html" class="active">Contact</a>
-  </div>
-</nav>
+    /* Contact Form */
+    form { display: grid; gap: 1rem; }
+    label { font-weight: bold; margin-bottom: 0.25rem; display: block; }
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    textarea { resize: vertical; min-height: 150px; }
+    .btn-submit {
+      width: max-content;
+      padding: 0.75rem 1.5rem;
+      background: #ed8936;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 1rem;
+    }
+    .btn-submit:hover { background: #dd6b20; }
 
-    <!-- Page content -->
-    <main class="px-3">
-      <h1>Contact Us</h1>
-      <p>Coming soon…</p>
-    </main>
-  </body>
+    /* Footer (shared) */
+    footer { background: #1a202c; color: #a0aec0; padding: 2rem 1rem; margin-top: 3rem; }
+    footer .container { max-width: 1200px; margin: 0 auto; text-align: center; }
+    .social-links { list-style: none; display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+    footer p { margin-top: 1rem; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; flex-direction: column; }
+      .nav-toggle { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo">Community Gardens in Toronto</div>
+      <div class="nav-toggle">☰</div>
+    </div>
+    <nav class="nav-container">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="map.html">Map</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Contact Us</h1>
+    <p>Please enter your name, email, and question below.</p>
+
+    <!-- Formspree integration -->
+    <form action="https://formspree.io/f/xpwlznzz" method="POST">
+      <!-- Redirect after submission -->
+      <input type="hidden" name="_next" value="thank-you.html" />
+      <!-- Email recipient (configured in Formspree dashboard) -->
+      <input type="hidden" name="_to" value="arfha.rahman@torontomu.ca" />
+
+      <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Your Name" required />
+      </div>
+      <div>
+        <label for="email">Email</nlabel>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required />
+      </div>
+      <div>
+        <label for="question">Question</label>
+        <textarea id="question" name="question" placeholder="Your question..." required></textarea>
+      </div>
+      <button type="submit" class="btn-submit">Send Question</button>
+    </form>
+  </main>
+
+  <footer>
+    <div class="container">
+      <ul class="social-links">
+        <li><a href="mailto:info@restoringroots.org">Email Us</a></li>
+        <li><a href="map.html">Map</a></li>
+      </ul>
+      <p>All rights reserved © 2025 Community Gardens in Toronto</p>
+    </div>
+  </footer>
+
+  <script>
+    // Toggle mobile nav
+    const toggle = document.querySelector('.nav-toggle');
+    const links = document.querySelector('.nav-links');
+    toggle.addEventListener('click', () => {
+      links.style.display = links.style.display === 'flex' ? 'none' : 'flex';
+    });
+  </script>
+</body>
 </html>
