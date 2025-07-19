@@ -87,7 +87,8 @@
 
       // Data arrays
     const gardens = [
-      { name: "Alex Wilson Community Garden", address: "552 Richmond St W", lat: 43.64724805, lng: -79.40062398 },
+      { name: "Alex Wilson Community Garden", address: "552 Richmond St W", lat: 43.64724805, lng: -79.40062398, description: "A volunteer-run plot in the heart of downtown, with raised beds and seasonal workshops.",
+    url: "https://youtube.com" },
       { name: "Alexandra Park Diversity Garden", address: "275 Bathurst St", lat: 43.65066359, lng: -79.40356065 },
       { name: "Ashbridges ECO Community Garden", address: "1956 Dundas St E", lat: 43.66914416, lng: -79.31647543 },
       { name: "Beach Community Edible Garden", address: "1561 Lakeshore Blvd E", lat: 43.65870548, lng: -79.30895749 },
@@ -299,15 +300,25 @@ tchGardens.forEach(g => {
 });
       // Render list
       function renderList(list) {
-        const ul = document.getElementById('list'); ul.innerHTML='';
-        list.forEach(item => {
-          const li = document.createElement('li');
-          li.textContent = item.dist != null
-            ? `${item.name} — ${(item.dist/1000).toFixed(2)} km`
-            : item.name;
-          ul.appendChild(li);
-        });
-      }
+  const ul = document.getElementById('list');
+  ul.innerHTML = '';
+  list.forEach(item => {
+    const li = document.createElement('li');
+    // build up innerHTML with name, distance, desc, link
+    let html = `<strong>${item.name}</strong>`;
+    if (item.dist != null) {
+      html += ` — ${(item.dist/1000).toFixed(2)} km`;
+    }
+    if (item.description) {
+      html += `<br><em>${item.description}</em>`;
+    }
+    if (item.url) {
+      html += `<br><a href="${item.url}" target="_blank">Learn more</a>`;
+    }
+    li.innerHTML = html;
+    ul.appendChild(li);
+  });
+}
       
 document.getElementById('list').addEventListener('click', e => {
   // only act when an <li> is clicked
